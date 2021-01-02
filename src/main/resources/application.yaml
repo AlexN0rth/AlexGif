@@ -1,1 +1,10 @@
+feign:
+  gif-service:
+    name: Giphy
+    url: https://api.giphy.com
+  rate-service:
+    name: OpenExchangeRates
+    url: https://openexchangerates.org
+    app-id: c5331769149f4f59bd5afce1b0076d45
+    base-currency: USD
 
