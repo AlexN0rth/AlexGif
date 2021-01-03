@@ -2,9 +2,15 @@ feign:
   gif-service:
     name: Giphy
     url: https://api.giphy.com
+    app-id: cvIqh1mSyZxurM1LvU5F70j4oxJVpWMh
   rate-service:
     name: OpenExchangeRates
     url: https://openexchangerates.org
     app-id: c5331769149f4f59bd5afce1b0076d45
     base-currency: USD
 
+json:
+  inner:
+    path: C:\Users\Alex\IdeaProjects\alex-gif\src\main\java\ru\petrukhin\alexgif\inner\inner.json
+  outer:
+    path: C:\Users\Alex\IdeaProjects\alex-gif\src\main\java\ru\petrukhin\alexgif\outer\outer.json
