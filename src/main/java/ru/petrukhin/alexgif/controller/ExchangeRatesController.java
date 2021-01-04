@@ -1,21 +1,20 @@
 package ru.petrukhin.alexgif.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.petrukhin.alexgif.httpclient.ExchangeRatesFeignClient;
-import ru.petrukhin.alexgif.inner.Inner;
 import ru.petrukhin.alexgif.outer.Gif;
-import ru.petrukhin.alexgif.outer.Rates;
 import ru.petrukhin.alexgif.service.GifService;
+import ru.petrukhin.alexgif.service.InnerService;
+import ru.petrukhin.alexgif.service.RateService;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -23,8 +22,9 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/rates")
 public class ExchangeRatesController {
-    private final ObjectMapper mapper = new ObjectMapper();
     private final GifService gifService;
+    private final RateService rateService;
+    private final InnerService innerService;
     @Autowired
     ExchangeRatesFeignClient exchangeRatesFeignClient;
     private LocalDate today = LocalDate.now();
@@ -34,24 +34,31 @@ public class ExchangeRatesController {
     private String appId;
     @Value("${feign.rate-service.base-currency}")
     private String baseCurrency;
-    @Value("${json.inner.path}")
-    private String path;
+
 
     @GetMapping
     public @ResponseBody
-    Gif handleRate() throws IOException {
-        try (FileReader reader = new FileReader(path)) {
-            Inner inner = mapper.readValue(reader, Inner.class);
-            Rates todayRates = handleQuery(exchangeRatesFeignClient.getRates(today + ".json", appId, baseCurrency, inner.getData().getSymbols()), today);
-            Rates yesterdayRates = handleQuery(exchangeRatesFeignClient.getRates(yesterday + ".json", appId, baseCurrency, inner.getData().getSymbols()), yesterday);
-
-            return gifService.handleGif(todayRates, yesterdayRates, inner);
+    ResponseEntity<Gif> handleRate() throws IOException {
+        String symbols = innerService.handleInnerJson();
+        if (!(symbols.equals("RUB") || symbols.equals("BYN"))) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        String todayResponse = exchangeRatesFeignClient.getRates(today + ".json", appId, baseCurrency, symbols);
+        String yesterdayResponse = exchangeRatesFeignClient.getRates(yesterday + ".json", appId, baseCurrency, symbols);
+        if (todayResponse == null || todayResponse.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (yesterdayResponse == null || yesterdayResponse.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Gif gif = gifService.handleGif(rateService.handleResponse(todayResponse, today), rateService.handleResponse(yesterdayResponse, yesterday), symbols);
+        if (gif == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(gif, HttpStatus.OK);
+
     }
 
-    private Rates handleQuery(String query, LocalDate date) throws JsonProcessingException {
-        Rates rates = mapper.readValue(query, Rates.class);
-        rates.setDate(String.valueOf(date));
-        return rates;
-    }
+
 }
