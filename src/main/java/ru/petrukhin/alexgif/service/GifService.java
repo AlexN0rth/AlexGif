@@ -1,17 +1,18 @@
 package ru.petrukhin.alexgif.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.petrukhin.alexgif.httpclient.GiphyFeignClient;
-import ru.petrukhin.alexgif.inner.Inner;
 import ru.petrukhin.alexgif.outer.Gif;
-import ru.petrukhin.alexgif.outer.Rates;
+import ru.petrukhin.alexgif.outer.Rate;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class GifService {
     private static String tag = "broke";
@@ -24,14 +25,22 @@ public class GifService {
     @Value("${json.outer.path}")
     private String path;
 
-    public Gif handleGif(Rates today, Rates yesterday, Inner inner) throws IOException {
-        Double todayValue = today.getRates().get(inner.getData().getSymbols());
-        Double yesterdayValue = yesterday.getRates().get(inner.getData().getSymbols());
+    public Gif handleGif(Rate todayRate, Rate yesterdayRate, String symbols) throws IOException {
+        Gif gif = null;
+        if (todayRate == null || yesterdayRate == null) {
+            return gif;
+        }
+        Double todayValue = todayRate.getRates().get(symbols);
+        Double yesterdayValue = yesterdayRate.getRates().get(symbols);
         if (todayValue >= yesterdayValue) {
             tag = "rich";
         }
-        Gif gif = mapper.readValue(giphyFeignClient.getGif(appId, tag), Gif.class);
-        createJson(gif);
+        gif = mapper.readValue(giphyFeignClient.getGif(appId, tag), Gif.class);
+        try {
+            createJson(gif);
+        } catch (IOException e) {
+            log.info("JSON file write exception");
+        }
         return gif;
     }
 
