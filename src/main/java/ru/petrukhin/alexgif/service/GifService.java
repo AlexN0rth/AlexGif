@@ -63,11 +63,11 @@ public class GifService {
         } catch (JsonProcessingException e) {
             log.info("Read gif response exception");
         }
-        try {
-            createJson(gif);
-        } catch (IOException e) {
-            log.info("JSON file write exception");
-        }
+//        try {
+////            createJson(gif);
+//        } catch (IOException e) {
+//            log.info("JSON file write exception");
+//        }
         return gif;
     }
 

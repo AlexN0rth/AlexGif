@@ -48,14 +48,17 @@ public class ExchangeRatesController {
     private String appId;
     @Value("${feign.rate-service.base-currency}")
     private String baseCurrency;
+    @Value("${feign.rate-service.symbols}")
+    private String symbols;
+
 
     @GetMapping
     public @ResponseBody
     ResponseEntity<Gif> handleRate() {
-        String symbols = innerService.handleInnerJson();
-        if (!(symbols.equals("RUB") || symbols.equals("BYN"))) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+//        String symbols = innerService.handleInnerJson();
+//        if (!(symbols.equals("RUB") || symbols.equals("BYN"))) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
         Rate todayRate;
         Rate yesterdayRate;
         try {
