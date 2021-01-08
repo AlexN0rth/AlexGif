@@ -12,6 +12,6 @@ feign:
 
 json:
   inner:
-    path: C:\Users\Alex\IdeaProjects\alex-gif\src\main\java\ru\petrukhin\alexgif\inner\inner.json
+    path: src/main/java/ru/petrukhin/alexgif/inner/inner.json
   outer:
-    path: C:\Users\Alex\IdeaProjects\alex-gif\src\main\java\ru\petrukhin\alexgif\outer\outer.json
+    path: src/main/java/ru/petrukhin/alexgif/outer/outer.json
