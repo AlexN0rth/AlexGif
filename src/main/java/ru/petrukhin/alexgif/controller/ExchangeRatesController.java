@@ -20,6 +20,17 @@ import ru.petrukhin.alexgif.service.RateService;
 
 import java.time.LocalDate;
 
+/**
+ * This class represents a REST Controller for receiving requests from the client.
+ * It contains a {@code handleRate()} method that processes currency exchange rate information received from the external currency service
+ * and returns a ResponseEntity object which contains a gif object and http status.
+ *
+ * @author Alex
+ * @see ru.petrukhin.alexgif.service.InnerService
+ * @see ru.petrukhin.alexgif.service.RateService
+ * @see ru.petrukhin.alexgif.service.GifService
+ * @see ru.petrukhin.alexgif.httpclient.ExchangeRatesFeignClient
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController

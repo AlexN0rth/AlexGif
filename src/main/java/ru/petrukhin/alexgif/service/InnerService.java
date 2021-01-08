@@ -9,6 +9,12 @@ import ru.petrukhin.alexgif.inner.Inner;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * * This class represents an internal service for a REST Controller (ExchangeRatesController).
+ *
+ * @author Alex
+ * @see ru.petrukhin.alexgif.controller.ExchangeRatesController
+ */
 @Slf4j
 @Service
 public class InnerService {
@@ -17,6 +23,11 @@ public class InnerService {
     @Value("${json.inner.path}")
     private String path;
 
+    /**
+     * This method uses the ObjectMapper from the Jackson library to read read the incoming JSON file (inner.json) and fill the Inner object
+     *
+     * @return String value of the currency name obtained from the Inner object
+     */
     public String handleInnerJson() {
         Inner inner;
         try (FileReader reader = new FileReader(path)) {
