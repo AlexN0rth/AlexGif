@@ -14,6 +14,15 @@ import ru.petrukhin.alexgif.outer.Rate;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * This class represents an internal service for a REST Controller (ExchangeRatesController).
+ * It accesses an external service through the Feign Client (giphyFeignClient).
+ *
+ * @author Alex
+ * @see GiphyFeignClient
+ * @see ru.petrukhin.alexgif.controller.ExchangeRatesController
+ * @see ru.petrukhin.alexgif.service.RateService
+ */
 @Slf4j
 @Service
 public class GifService {
@@ -27,6 +36,15 @@ public class GifService {
     @Value("${json.outer.path}")
     private String path;
 
+    /**
+     * This method compares the exchange rate values of two Rate objects.
+     * Based on the comparison result, passes the required tag to send the request through the Feign Client
+     *
+     * @param todayRate     Rate object received from the internal service named RateService that contains the exchange rate for today
+     * @param yesterdayRate Rate object received from the internal service named RateService that contains the exchange rate for yesterday
+     * @param symbols       A string value obtained from an internal service named InnerService that contains 3-letter currency code
+     * @return Gif object containing the Gif URL received from the external Giphy service
+     */
     public Gif handleGif(Rate todayRate, Rate yesterdayRate, String symbols) {
         Gif gif = null;
         if (todayRate == null || yesterdayRate == null) {
@@ -53,6 +71,12 @@ public class GifService {
         return gif;
     }
 
+    /**
+     * This method uses the ObjectMapper from the Jackson library to write the value from the Gif object to a JSON file (outer.json).
+     *
+     * @param gif Gif object containing the Gif URL received from the external Giphy service
+     * @throws IOException e
+     */
     private void createJson(Gif gif) throws IOException {
         try (FileWriter writer = new FileWriter(path)) {
             mapper.writeValue(writer, gif);
