@@ -1,6 +1,8 @@
 package ru.petrukhin.alexgif.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ public class GifService {
     @Value("${json.outer.path}")
     private String path;
 
-    public Gif handleGif(Rate todayRate, Rate yesterdayRate, String symbols) throws IOException {
+    public Gif handleGif(Rate todayRate, Rate yesterdayRate, String symbols) {
         Gif gif = null;
         if (todayRate == null || yesterdayRate == null) {
             return gif;
@@ -35,7 +37,14 @@ public class GifService {
         if (todayValue >= yesterdayValue) {
             tag = "rich";
         }
-        gif = mapper.readValue(giphyFeignClient.getGif(appId, tag), Gif.class);
+        try {
+            gif = mapper.readValue(giphyFeignClient.getGif(appId, tag), Gif.class);
+        } catch (FeignException e) {
+            log.info("Gif service is not responding");
+            return gif;
+        } catch (JsonProcessingException e) {
+            log.info("Read gif response exception");
+        }
         try {
             createJson(gif);
         } catch (IOException e) {

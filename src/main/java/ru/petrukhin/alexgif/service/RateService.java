@@ -19,7 +19,7 @@ public class RateService {
             rate = mapper.readValue(response, Rate.class);
             rate.setDate(String.valueOf(date));
         } catch (JsonProcessingException e) {
-            log.info("Read response exception");
+            log.info("Read rate response exception");
             return rate;
         }
         return rate;
