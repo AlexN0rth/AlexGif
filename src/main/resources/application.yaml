@@ -8,6 +8,7 @@ feign:
     url: https://openexchangerates.org
     app-id: c5331769149f4f59bd5afce1b0076d45
     base-currency: USD
+    symbols: RUB
 
 json:
   inner:

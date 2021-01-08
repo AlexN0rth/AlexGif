@@ -1,0 +1,9 @@
+version: "3"
+services:
+  gif:
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    volumes:
+      - C:\Users\Alex\IdeaProjects\alex-gif\src\main\java\ru\petrukhin\alexgif\inner:/inner
